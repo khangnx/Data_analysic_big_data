@@ -119,6 +119,110 @@
 |Visualization|Matplotlib, Seaborn, Plotly|
 |ML/AI|Scikit-learn, TensorFlow, Keras, PyTorch, NLTK|
 
+### **** Hadoop: Hadoop không chỉ đóng vai trò như một data warehouse phân tán, mà còn có thể đảm nhiệm nhiều chức năng khác trong hệ sinh thái xử lý dữ liệu lớn. Dưới đây là các vai trò và ứng dụng chính của Hadoop:
+
+        ## 1. Hệ thống lưu trữ phân tán (Distributed Storage System)
+        - HDFS (Hadoop Distributed File System) cho phép lưu trữ dữ liệu lớn trên nhiều máy chủ, đảm bảo tính chịu lỗi và khả năng mở rộng.
+        - Dữ liệu được chia nhỏ và lưu trên nhiều node, giúp xử lý song song hiệu quả.
+        
+        ## 2. Hệ thống xử lý dữ liệu phân tán (Distributed Processing)
+        - MapReduce là mô hình lập trình cho phép xử lý dữ liệu lớn theo cách song song và phân tán.
+        - Thích hợp cho các tác vụ như lọc, tổng hợp, phân tích log, ETL.
+        
+        ## 3. Nền tảng cho các công cụ phân tích dữ liệu
+        Hadoop là nền tảng cho nhiều công cụ phân tích dữ liệu lớn:
+        
+        | Công cụ | Mô tả |
+        |--------|------|
+        | Hive | Ngôn ngữ SQL-like để truy vấn dữ liệu trên HDFS |
+        | Pig | Ngôn ngữ kịch bản xử lý dữ liệu bán cấu trúc |
+        | Spark | Xử lý dữ liệu nhanh hơn MapReduce, hỗ trợ in-memory |
+        | HBase | Cơ sở dữ liệu NoSQL phân tán, chạy trên HDFS |
+        | Mahout | Thư viện học máy (machine learning) trên Hadoop |
+        | Oozie | Công cụ quản lý workflow cho các job Hadoop |
+        
+        ## 4. Lưu trữ và xử lý dữ liệu phi cấu trúc
+        - Hadoop có thể xử lý dữ liệu từ nhiều nguồn: log web, video, hình ảnh, âm thanh, dữ liệu cảm biến IoT…
+        - Thích hợp cho các hệ thống phân tích hành vi người dùng, phân tích mạng xã hội, dữ liệu y tế…
+        
+        ## 5. Hỗ trợ hệ thống real-time và batch
+        - Dù Hadoop truyền thống thiên về batch processing, nhưng khi kết hợp với Spark Streaming, Kafka, Flink… có thể xử lý dữ liệu thời gian thực.
+        
+        ## 6. Ứng dụng trong AI/ML
+        - Dữ liệu lớn được lưu trữ và xử lý bằng Hadoop có thể dùng để huấn luyện mô hình AI/ML.
+        - Kết hợp với Mahout hoặc Spark MLlib để triển khai các thuật toán học máy.
+        
+        ## 7. ETL và Data Lake
+        - Hadoop thường được dùng làm data lake lưu trữ dữ liệu thô từ nhiều nguồn.
+        - Sau đó dùng Hive, Spark hoặc Presto để xử lý và trích xuất dữ liệu phục vụ phân tích.
+        
+        ---
+        
+        # Tư vấn kiến trúc Hadoop cho dự án
+        
+        ## 1. Tổng quan kiến trúc Hadoop
+        
+        Hadoop gồm 4 thành phần lõi (HDFS, YARN, MapReduce, Common), chạy theo mô hình Master–Slave trên đa node:
+        
+        - **HDFS**: lưu dữ liệu phân mảnh thành block, lưu trên DataNode, quản lý metadata bởi NameNode với cơ chế replication để chịu lỗi.
+        - **YARN**: ResourceManager (Master) phân phối tài nguyên, NodeManager (Slave) chịu trách nhiệm chạy task, cho phép chạy cả MapReduce và Spark.
+        - **MapReduce**: xử lý batch theo mô hình song song với Mapper → Shuffle → Reducer.
+        - **Hadoop Common**: thư viện dùng chung hỗ trợ các module trên.
+        
+        ## 2. Kiến trúc hệ thống đề xuất
+        ```
+        Clients/API
+           ↓
+        Ingress Layer (Kafka, NiFi, Flume)
+           ↓
+        HDFS Storage (raw & processed)
+           ↓
+        Processing Layer (YARN: MapReduce / Spark / Hive / Pig)
+           ↓
+        Data Lakezone (curated/analytics)
+           ↓
+        Serving Layer (HBase / Hive Thrift / Impala / Presto)
+           ↓
+        BI / ML / Analytics
+        
+        ```
+        ## 3. Best Practices
+        
+        - Phân vùng dữ liệu theo thời gian.
+        - Replication HDFS = 3.
+        - Tách layer lưu trữ: raw, curated, analytics.
+        - Dùng Spark cho xử lý nhanh, MapReduce cho batch truyền thống.
+        - Giám sát cluster bằng Ganglia, Cloudera Manager.
+        
+        ## 4. Tích hợp với AWS
+        
+        ### A. Dùng EMR:
+        - Quản lý cluster tự động.
+        - Tích hợp S3, Auto Scaling, CloudWatch.
+        
+        ### B. Tự triển khai trên EC2:
+        - Dùng EBS cho lưu trữ, snapshot để backup.
+        - Lưu dữ liệu lâu dài lên S3 qua S3A hoặc distcp.
+        
+        ### Ví dụ triển khai trên AWS
+        
+        | Node Type   | Instance Type | Role                             |
+        |-------------|----------------|----------------------------------|
+        | Master      | m5.xlarge      | NameNode, ResourceManager        |
+        | Core/Worker | r5.2xlarge     | DataNode, NodeManager, Spark     |
+        | Utility     | t3.large       | Zookeeper, HiveServer, Oozie     |
+        | AWS Storage | S3 + EBS       | Data persistence, backup         |
+        
+        ---
+        
+        ## 📌 Tổng kết
+        
+        - Hadoop phù hợp làm data lake, batch ETL, phân tích dữ liệu lớn.
+        - Kiến trúc nên phân lớp rõ ràng để dễ bảo trì và mở rộng.
+        - AWS EMR giúp triển khai nhanh, EC2 giúp kiểm soát sâu.
+        - Áp dụng best practices để tối ưu chi phí và hiệu năng.
+                ```
+               
 ### Ghi chú
 
 - Python là ngôn ngữ trung tâm trong hệ sinh thái phân tích dữ liệu lớn.
