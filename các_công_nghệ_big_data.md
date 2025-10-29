@@ -3,6 +3,52 @@
 ### 1. Hệ thống xử lý phân tán
 
 - **Apache Spark (PySpark)**: Là framework xử lý dữ liệu lớn theo mô hình phân tán. PySpark là API Python của Spark, cho phép xử lý dữ liệu dạng RDD (Resilient Distributed Dataset) và DataFrame. Spark hỗ trợ cả xử lý batch (dữ liệu theo lô) và streaming (dữ liệu thời gian thực).
+#  Cách Pyspank chuẩn hóa, kiểm tra data
+        🧼 1. Chuẩn hóa dữ liệu (Normalization)
+        Pyspank thực hiện chuẩn hóa thông qua các bước sau:
+        a. Loại bỏ khoảng trắng và ký tự đặc biệt
+        
+        Tự động loại bỏ khoảng trắng dư thừa ở đầu/cuối chuỗi.
+        Chuẩn hóa các ký tự đặc biệt, ví dụ: chuyển “” thành " hoặc ‘’ thành '.
+        
+        b. Đổi tên cột (Column Renaming)
+        
+        Chuyển tên cột về định dạng chuẩn: viết thường, thay khoảng trắng bằng dấu gạch dưới (_), loại bỏ ký tự không hợp lệ.
+        Ví dụ: "Tên khách hàng" → "ten_khach_hang"
+        
+        c. Chuẩn hóa kiểu dữ liệu (Data Type Normalization)
+        
+        Tự động nhận diện và chuyển đổi kiểu dữ liệu phù hợp: ngày tháng, số, chuỗi.
+        Ví dụ: "2025-10-29" → kiểu datetime, "1,000" → kiểu int.
+        
+        d. Xử lý giá trị thiếu (Missing Values)
+        
+        Phát hiện các giá trị thiếu như "NA", "null", "?", "" và chuyển thành np.nan.
+        Có thể cấu hình để điền giá trị mặc định hoặc loại bỏ dòng chứa giá trị thiếu.
+        
+        
+        🔍 2. Kiểm tra dữ liệu (Validation)
+        Pyspank cung cấp các công cụ kiểm tra dữ liệu trước khi đưa vào pandas:
+        a. Kiểm tra định dạng cột
+        
+        Xác minh xem các cột có đúng định dạng mong muốn không (ví dụ: cột ngày phải là kiểu datetime).
+        Báo lỗi nếu có cột sai định dạng.
+        
+        b. Kiểm tra giá trị bất thường (Outliers)
+        
+        Phát hiện các giá trị nằm ngoài khoảng hợp lý (ví dụ: tuổi > 120).
+        Có thể cấu hình ngưỡng kiểm tra.
+        
+        c. Kiểm tra trùng lặp (Duplicates)
+        
+        Phát hiện các dòng trùng lặp hoàn toàn hoặc theo một số cột nhất định.
+        Có thể tự động loại bỏ hoặc cảnh báo.
+        
+        d. Kiểm tra tính nhất quán (Consistency)
+        
+        Kiểm tra xem các giá trị trong một cột có đồng nhất không (ví dụ: cột giới tính chỉ nên có Nam, Nữ).
+        Phát hiện lỗi chính tả hoặc viết hoa/thường không đồng nhất.
+
 
 - **Apache Flink (PyFlink)**: Tập trung vào xử lý dữ liệu streaming với độ trễ thấp. PyFlink là API Python cho phép viết các hàm xử lý tùy chỉnh. Flink phù hợp với các ứng dụng cần phản hồi nhanh như phân tích log, giao dịch tài chính.
 
